@@ -51,11 +51,24 @@ class Database():
         # self.conn.commit()
         return data
 
-    def delete_data_from_table(self, name: str, data: dict[str, str]):
-        pass
+    def delete_data_from_table(self, name: str, id: int):
+        self.cursor.execute(f'delete from {name} where id={id}')
+        self.conn.commit()
 
     def alter_data_from_table(self, name: str, old: int, new: dict[str, str]):
-        pass
+        updates = ""
+        fields = self.get_fields(name)
+        new_keys = [keys for keys in new]
+        for field_key in fields:
+            if field_key == 'id':
+                continue
+            if field_key not in new_keys:
+                continue
+            updates += field_key + " = '" + new[field_key] + "', "
+        updates = updates[:len(updates) - 2]
+        # print(updates)
+        self.cursor.execute(f'update {name} set {updates}')
+        self.conn.commit()
 
     def __sql(self, command):
         self.cursor.execute(command)
