@@ -2,7 +2,7 @@ import sqlite3
 
 class Database():
     def __init__(self, db):
-        self.conn = sqlite3.connect(db)
+        self.conn = sqlite3.connect(db, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
     def create_table(self, name: str, fields: dict[str, str]):
