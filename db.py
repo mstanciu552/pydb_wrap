@@ -19,15 +19,22 @@ class Database():
         self.cursor.execute(f'drop table if exists {name}')
         self.conn.commit()
 
-    def get_data_from_table(self, table_name: str):
-        self.cursor.execute(f'select * from {table_name}')
-        data = self.cursor.fetchall()
-        self.conn.commit()
-        return data
-
     def get_fields(self, name: str):
         self.cursor.execute(f'select * from {name}')
         return [description[0] for description in self.cursor.description]
+
+    def get_data_from_table(self, table_name: str):
+        self.cursor.execute(f'select * from {table_name}')
+        
+        data = self.cursor.fetchall()
+        fields = tuple(self.get_fields(table_name))
+        
+        response = []
+        for row in data:
+           temp = dict(zip(fields, row))
+           response.append(temp)
+        
+        return response
 
     def insert_data_into_table(self, name: str, data: dict[str, str]):
         keys = [k for k in data]
@@ -66,7 +73,7 @@ class Database():
                 continue
             updates += field_key + " = '" + new[field_key] + "', "
         updates = updates[:len(updates) - 2]
-        # print(updates)
+
         self.cursor.execute(f'update {name} set {updates}')
         self.conn.commit()
 
